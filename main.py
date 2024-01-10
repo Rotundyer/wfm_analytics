@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 from fastapi.routing import APIRouter
-from api.bd_handlers import db_router
+from api.db_handlers import db_router
 from api.local_handlers import local_router
 
 # Развёртка API
@@ -9,7 +9,6 @@ app = FastAPI(title="Analysis API")
 
 # Основной путь
 main_api_router = APIRouter()
-
 
 # Добавление побочных путей
 # db - путь для работы с БД

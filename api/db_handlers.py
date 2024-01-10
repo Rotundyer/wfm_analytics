@@ -1,7 +1,7 @@
 from os import listdir as os_listdir
 from json import load as json_load
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.dals.item_dal import ItemDAL
@@ -22,7 +22,12 @@ db_router = APIRouter()
 # Пополнение таблиц локальными данными из папки temple
 # Актуальные данные по пути temple/wfm-items-master/items
 @db_router.post('/update_tables')
-async def value_tags_db(db: AsyncSession = Depends(get_db)):
+async def db_update(background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
+    background_tasks.add_task(db_update_local, db)
+    return 'loading...'
+
+
+async def db_update_local(db: AsyncSession):
     # Закачака данных из github в виде zipfile и его разорхивации
     # https://github.com/42bytes-team/wfm-items
     items_download()
@@ -133,7 +138,6 @@ async def value_tags_db(db: AsyncSession = Depends(get_db)):
                             await part_of_set_dal.create_part_of_set_with_str(main_name=url_name, part_name=part)
                     except:
                         continue
-        return 'completed'
 
 
 # Класс для проверки данных на существование и обработку обратного
